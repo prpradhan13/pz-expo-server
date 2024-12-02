@@ -120,6 +120,59 @@ export const getTraining = async (req, res) => {
   }
 };
 
+export const addNewDataOnExistingTraining = async (req, res) => {
+  try {
+    const { userId } = req?.auth;
+    const { trainingId } = req.params;
+    const { trainingPlan } = req.body;
+
+    // Ensure user is authenticated and has a valid userId
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: User not found.",
+      });
+    }
+
+    if (!trainingId) {
+      return res.status(401).json({
+        success: false,
+        message: "Training id not found.",
+      });
+    }
+
+    if (!trainingPlan || trainingPlan.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide data",
+      });
+    }
+
+    const newAddedTraining = await Training.findByIdAndUpdate(
+      trainingId,
+      { $push: { trainingPlan } },
+      {new: true}
+    )
+
+    // Check if cacheKey exists and then delete the cache
+    const cacheKey = `training_${userId}`;
+    cache.del(cacheKey);
+
+    return res.status(200).json({
+      success: true,
+      message: "New exercise added",
+      trainingData: newAddedTraining
+    })
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error while add training",
+    });
+  }
+}
+
 export const allPublicTrainingData = async (req, res) => {
   try {
     const {
@@ -205,7 +258,7 @@ export const updatePublicField = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Training updated successfully",
-      todoData: updatePublic,
+      trainingData: updatePublic,
     });
   } catch (error) {
     console.log(error);

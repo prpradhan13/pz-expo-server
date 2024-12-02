@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
-import { clerkClient, clerkMiddleware } from '@clerk/express';
+import { clerkMiddleware } from '@clerk/express';
 import expenseRoute from './routes/expense.route.js';
 import trainingRoute from './routes/training.route.js';
 import todoRoute from './routes/todo.route.js';
@@ -19,16 +19,16 @@ connectDB();
 
 const app = express();
 
-const corsOptions = {
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
-};
+// const corsOptions = {
+//     origin: process.env.CORS_ORIGIN,
+//     credentials: true
+// };
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
     limit: 100 // limit each IP to 100 requests per windowMs
 })
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json({limit: "16kb"}));
 app.use(express.urlencoded({extended: true, limit: "16kb"}));
 app.use(cookieParser());

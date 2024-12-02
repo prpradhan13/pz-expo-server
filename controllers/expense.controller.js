@@ -175,7 +175,7 @@ export const updateExpense = async (req, res) => {
     }
 
     // Use user-specific cache key
-    const { userId } = req.auth;
+    const { userId } = req?.auth;
     const cacheKey = `expenses_${userId}`;
     cache.del(cacheKey);
 
